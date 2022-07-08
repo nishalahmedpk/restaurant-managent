@@ -1,6 +1,8 @@
+from glob import glob
 from tkinter import *
 from tkinter import ttk
 from database import *
+import os
 
 
 ap = Tk()
@@ -8,10 +10,28 @@ ap.title('Restaurant Management 0.1 Beta')
 ap.geometry('900x700+0+0')
 ap.resizable(False,False)
 
+
+
 #==========Commmands=================
 def placeorder():
     generatebill['state'] = DISABLED
-
+def gosettings():
+    settings = Toplevel(ap)
+    settings.title('Preferences')
+    settings.geometry('900x475+0+150')
+    settings.mainloop()
+def godiscounts():
+    discounts = Toplevel(ap)
+    discounts.title('Discounts')
+    discounts.geometry('900x475+0+150')
+    discounts.mainloop()
+def goneworder():
+    pass
+def addinv():
+    inv = Toplevel(ap)
+    inv.title('Add Inventory')
+    inv.geometry('900x475+0+150')
+    inv.mainloop()
 
 #Main Frame
 app = Frame(ap,relief='flat')
@@ -114,16 +134,16 @@ bill.grid(row=2)
 bottomframe = LabelFrame(app,bd=5,relief='ridge')
 bottomframe.place(x=0,y=620,height=80,width=900)
 
-newfood = Button(bottomframe,text='Add To Inventory',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black')
+newfood = Button(bottomframe,text='Add To Inventory',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black',command=addinv)
 newfood.place(x=5,y=5)
 
-settings = Button(bottomframe,text='Preferences',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black')
-settings.place(x=205,y=5)
+settingsbutton = Button(bottomframe,text='Preferences',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black',command=gosettings)
+settingsbutton.place(x=205,y=5)
 
-discounts = Button(bottomframe,text='Discounts',font=('Arial',12,'bold'),padx=25,pady=15,fg='red',bg='black')
+discounts = Button(bottomframe,text='Discounts',font=('Arial',12,'bold'),padx=25,pady=15,fg='red',bg='black',command=godiscounts)
 discounts.place(x=515,y=5)
 
-neworder = Button(bottomframe,text='New Order',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black')
+neworder = Button(bottomframe,text='New Order',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black',command=goneworder)
 neworder.place(x=365,y=5)
 
 
