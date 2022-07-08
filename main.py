@@ -1,7 +1,7 @@
+from struct import pack
 from tkinter import *
 from tkinter import ttk
 from database import *
-import os
 
 def start():
     global ap
@@ -178,11 +178,18 @@ def start():
     addbutton.grid(row=0,column=5)
 
     #Items
-    itemsframe = LabelFrame(takeframe,bd=5,relief='ridge')
+    itemsframe = LabelFrame(takeframe,bd=5,relief='ridge',padx=10,pady=10)
     itemsframe.place(x=5,y=90,width=600,height=295)
 
     itemscroll = ttk.Scrollbar(itemsframe,orient=VERTICAL)
     itemscroll.pack(side='right',fill=Y)
+
+    items = LabelFrame(itemsframe,width=250,bd=5,height=500,relief='ridge',padx=10,pady=10)
+    items.pack(side='left',fill=Y)
+
+    item = LabelFrame(items,height=70,width=500,bd=5,relief='raised')
+    item.grid(row=0)
+    item.grid(row=2)
 
     #OrderStatus Generate Bill and Bill
     billframe = LabelFrame(takeframe,bd=5,relief='ridge')
