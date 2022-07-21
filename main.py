@@ -1,6 +1,7 @@
 from struct import pack
 from tkinter import *
 from tkinter import ttk
+from unicodedata import category
 from database import *
 
 def start():
@@ -11,8 +12,45 @@ def start():
 
     #==========Commmands=================
 
+    snumber = 1
+    def additem():
+        global snumber
+        global serialnumber
+        import csv
+        item = add.get()
+        quantityget=qnty.get()
+        with open('fooditems.csv','r+') as x:
+            r = csv.reader(x)
+            for i in r:
+                if i[0]==item:
+                    price = i[1]
+        #serialnumber['state'] = 'normal'
+        ite['state'] = 'normal'
+        price1['state']='normal'
+        quantity['state']='normal'
+        total1['state']='normal'
+
+        #serialnumber.insert(END,snumber+'\n')
+        ite.insert(END,item+'\n')
+        price1.insert(END,price+'\n')
+        quantity.insert(END,quantityget+'\n')
+        price = int(price)
+        quantityget = int(quantityget)
+        tot = price*quantityget
+        tot = str(tot)
+        total1.insert(END,tot+'\n')
+   
+        #serialnumber['state'] = 'normal'
+        ite['state'] = 'disabled'
+        price1['state']='disabled'
+        quantity['state']='disabled'
+        total1['state']='disabled'   
+
+
+
+    
     def placeorder():
-        generatebill['state'] = DISABLED
+        generatebill['state'] = 'disabled'
     def gosettings():
         settings = Toplevel(ap)
         settings.title('Preferences')
@@ -73,12 +111,27 @@ def start():
 
         discounts.mainloop()
     def addinv():
+
+        def addtodata():
+            import csv 
+            name = foodentry.get()
+            price = priceentry.get()
+            category = catentry.get()
+            with open('fooditems.csv','a+',newline='') as x:    
+                w = csv.writer(x)
+                w.writerow([name,price,category])
+
         inv = Toplevel(ap)
         inv.title('Add Inventory')
         inv.geometry('900x475+0+150')
         
         frame1 = Frame(inv,bd=5,height=375,width=800,relief='ridge',padx=20,pady=20)
         frame1.place(anchor=CENTER,relx=0.5, rely=0.5)
+
+        foodentry = StringVar()
+        catentry =StringVar()
+        priceentry = StringVar()
+        kywrdentry =StringVar()
 
         food =  Label(frame1,text='Name Of Food:',font=('arial',20,'bold'),pady=5,padx=5)
         food.grid(row=0,column=0)
@@ -87,24 +140,21 @@ def start():
 
         cat =  Label(frame1,text='Category:',font=('arial',20,'bold'),pady=5,padx=5)
         cat.grid(row=1,column=0)
-        catentry = ttk.Combobox(frame1,font=('arial',20,'bold'),state='readonly',width=19)
+        catentry = ttk.Combobox(frame1,font=('arial',20,'bold'),width=19)
         catentry['values'] = foodcategory
         catentry.grid(row=1,column=1)
 
-        price =  Label(frame1,text='Price:',font=('arial',20,'bold'),pady=5,padx=5)
-        price.grid(row=2,column=0)
+        pricee =  Label(frame1,text='Price:',font=('arial',20,'bold'),pady=5,padx=5)
+        pricee.grid(row=2,column=0)
         priceentry = Entry(frame1,font=('arial',20,'bold'))
         priceentry.grid(row=2,column=1)
-
-        kywrd =  Label(frame1,text='Keywords:',font=('arial',20,'bold'),pady=5,padx=5)
-        kywrd.grid(row=3,column=0)
-        kywrdentry = Entry(frame1,font=('arial',20,'bold'))
-        kywrdentry.grid(row=3,column=1)
-
-        add = Button(frame1,text='Add Item',font=('arial',20,'bold'),padx=80,bg='black',fg='white')
+        
+        add = Button(frame1,text='Add Item',font=('arial',20,'bold'),padx=80,bg='black',fg='white', command=addtodata)
         add.grid(row=4,column=1)
 
         inv.mainloop()
+
+
 
     #Main Frame
     app = Frame(ap,relief='flat')
@@ -174,22 +224,58 @@ def start():
     blank = Label(addframe,text='',padx=10)
     blank.grid(row=0,column=4)
 
-    addbutton = Button(addframe,text='Add', font=('Arial',12,'bold'),padx=20,fg='white',bg='black')
+    addbutton = Button(addframe,text='Add', font=('Arial',12,'bold'),padx=20,fg='white',bg='black',command=additem)
     addbutton.grid(row=0,column=5)
 
     #Items
     itemsframe = LabelFrame(takeframe,bd=5,relief='ridge',padx=10,pady=10)
     itemsframe.place(x=5,y=90,width=600,height=295)
 
-    itemscroll = ttk.Scrollbar(itemsframe,orient=VERTICAL)
-    itemscroll.pack(side='right',fill=Y)
 
-    items = LabelFrame(itemsframe,width=250,bd=5,height=500,relief='ridge',padx=10,pady=10)
-    items.pack(side='left',fill=Y)
+    #SNO
+    serialnumber = Text(itemsframe,width=4,height=15)
+    serialnumber.grid(row=0,column=0)
+    serialnumber.insert('1.0','S.NO\n')
+    serialnumber.insert('2.0','='*4+'\n')
+    serialnumber['state']='disabled'
 
-    item = LabelFrame(items,height=70,width=500,bd=5,relief='raised')
-    item.grid(row=0)
-    item.grid(row=2)
+    #ITEMS
+    iteframe = LabelFrame(itemsframe,bd=5,relief='flat',padx=10,pady=10)
+    iteframe.grid(row=0,column=1)
+    
+    ite = Text(iteframe,width=30,height=15)
+    ite.grid(row=0,column=1)
+    ite.insert('1.0','Items\n')
+    ite.insert('2.0',"="*30+'\n')
+    ite['state']='disabled'
+
+    #PRICE
+    price1frame = LabelFrame(itemsframe,bd=5,relief='flat',padx=5,pady=10)
+    price1frame.grid(row=0,column=2)
+    price1 = Text(price1frame,width=5,height=15)
+    price1.grid()
+    price1.insert('1.0','Price')
+    price1.insert('2.0','====='+'\n')
+    price1['state']='disabled'
+
+    #QUANTITY
+    quantity1frame = LabelFrame(itemsframe,bd=5,relief='flat',padx=5,pady=10)
+    quantity1frame.grid(row=0,column=3)
+    quantity = Text(quantity1frame,width=8,height=15)
+    quantity.grid()
+    quantity.insert('1.0','Quantity')
+    quantity.insert('2.0','='*8+'\n')
+    quantity['state']='disabled'
+
+    #TOTAL
+    total1frame = LabelFrame(itemsframe,bd=5,relief='flat',padx=5,pady=10)
+    total1frame.grid(row=0,column=4)
+    total1 = Text(total1frame,width=12,height=15)
+    total1.grid()
+    total1.insert('1.0','Total Price ')
+    total1.insert('2.0','='*12+'\n')
+    total1['state']='disabled'
+
 
     #OrderStatus Generate Bill and Bill
     billframe = LabelFrame(takeframe,bd=5,relief='ridge')
@@ -208,7 +294,7 @@ def start():
     generatebill = Button(billframe,text='Generate Bill', font=('Arial',12,'bold'),padx=67,fg='white',bg='black',command=lambda:placeorder)
     generatebill.grid(row=1)
 
-    bill = Text(billframe, height=14,width=30,pady=10)
+    bill = Text(billframe, height=14,width=30,pady=10,state='disabled')
     bill.grid(row=2)
 
 
