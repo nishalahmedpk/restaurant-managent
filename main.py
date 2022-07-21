@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from unicodedata import category
 from database import *
-
+snumber = 1
 def start():
     global ap
     ap = Tk()
@@ -12,10 +12,8 @@ def start():
 
     #==========Commmands=================
 
-    snumber = 1
     def additem():
         global snumber
-        global serialnumber
         import csv
         item = add.get()
         quantityget=qnty.get()
@@ -24,13 +22,13 @@ def start():
             for i in r:
                 if i[0]==item:
                     price = i[1]
-        #serialnumber['state'] = 'normal'
+        serialnumber['state'] = 'normal'
         ite['state'] = 'normal'
         price1['state']='normal'
         quantity['state']='normal'
         total1['state']='normal'
 
-        #serialnumber.insert(END,snumber+'\n')
+        serialnumber.insert(END,str(snumber)+'\n')
         ite.insert(END,item+'\n')
         price1.insert(END,price+'\n')
         quantity.insert(END,quantityget+'\n')
@@ -40,11 +38,12 @@ def start():
         tot = str(tot)
         total1.insert(END,tot+'\n')
    
-        #serialnumber['state'] = 'normal'
+        serialnumber['state'] = 'normal'
         ite['state'] = 'disabled'
         price1['state']='disabled'
         quantity['state']='disabled'
         total1['state']='disabled'   
+        snumber+=1
 
 
 
@@ -327,8 +326,9 @@ def start():
     ap.mainloop()
 
 def goneworder():
-    global ap
+    global ap, snumber
     ap.destroy()
+    snumber = 1
     start()
     
 start()
