@@ -1,9 +1,25 @@
-from struct import pack
+from cgitb import text
 from tkinter import *
 from tkinter import ttk
-from unicodedata import category
+from tkinter import messagebox
 from database import *
+
 snumber = 1
+noofitems = 0
+orderlist = []
+path = 'orders.csv' 
+
+#discount part will do later
+try:
+    discount = int(percententry.get())
+except NameError:
+    discount = 0
+
+try:
+    discountnumber = int(moneyentry.get())
+except NameError:
+    discountnumber = 0
+
 def start():
     global ap
     ap = Tk()
@@ -12,8 +28,57 @@ def start():
 
     #==========Commmands=================
 
+
+    def newdatabase():
+        
+        global path
+        import csv
+        with open(path,'w+',newline='') as x:
+            w= csv.writer(x)
+            w.writerow(['S.NO','Mobile No','No Of Items','Items','Type','Status','Total Price'])
+        
+    def getordernop():
+        global path
+        import csv
+        with open(path,'r+',newline='') as x:
+            r = csv.reader(x)
+            s=0
+            for i in r:
+
+                if i == []:
+                    newdatabase()
+                    s=0
+                elif i[0]=='S.NO':
+                    s=0
+                else:
+                    s = int(i[0])
+            return s+1
+
+    def addtodatabase():
+        global path,status123
+        #adds to orders.csv
+        #called in place order
+        import csv
+        serialnumber = getordernop()
+        moobilenumber = mobileno.get()
+        noofitemsoredered = noofitems
+        type123 = ordertypecombo.get()
+        status123 = paystatues.get()
+        tots = 0
+        o = []
+        for i in orderlist:
+            if orderlist!=[]:
+                d = i[0]
+            o.append(d)
+        for i in orderlist:
+            bill.insert(END,i[0]+'\t\t\t'+i[1]+'\n')
+            tots+=int(i[1])
+        with open(path,'a+',newline='') as x:
+            w = csv.writer(x)
+            w.writerow([serialnumber,moobilenumber,noofitemsoredered,o,type123,status123,tots])
+
     def additem():
-        global snumber
+        global snumber, orderlist,noofitems
         import csv
         item = add.get()
         quantityget=qnty.get()
@@ -28,6 +93,7 @@ def start():
         quantity['state']='normal'
         total1['state']='normal'
 
+
         serialnumber.insert(END,str(snumber)+'\n')
         ite.insert(END,item+'\n')
         price1.insert(END,price+'\n')
@@ -37,6 +103,11 @@ def start():
         tot = price*quantityget
         tot = str(tot)
         total1.insert(END,tot+'\n')
+
+        l1 = str(item)+' x'+str(quantityget)
+        l2 = tot
+        l = [l1,l2]
+        orderlist.append(l)
    
         serialnumber['state'] = 'normal'
         ite['state'] = 'disabled'
@@ -44,12 +115,52 @@ def start():
         quantity['state']='disabled'
         total1['state']='disabled'   
         snumber+=1
+        noofitems += 1*quantityget
 
 
 
     
     def placeorder():
-        generatebill['state'] = 'disabled'
+        global orderlist,discount,discountdata
+        if len(mobileno.get()) < 11 or ordertypecombo.get()=='' or paystatues.get()=='' or orderlist==[]:
+            messagebox.showerror('Error','Enter All Fields Properly')
+        else:
+            addtodatabase()
+            type123 = ordertypecombo.get()
+            status123 = paystatues.get()
+            generatebill['state'] = 'disabled'
+            addbutton['state'] = 'disabled'
+            discounts['state'] = 'disabled'
+            
+            #bill
+            bill['state']='normal'
+            restaurantname='RESTAURANT NAME'
+            bill.insert(END,restaurantname.center(30))
+            bill.insert(END,'-'*30+'\n')
+            bill.insert(END,'Item\t\t\tPrice\n')
+            bill.insert(END,'-'*30+'\n')
+            tots = 0
+            for i in orderlist:
+                bill.insert(END,i[0]+'\t\t\t'+i[1]+'\n')
+                tots+=int(i[1])
+            tots2 = tots + (tots*taxdata)/100 - (tots*discountdata)/100 - (tots*discount)/100 - discountnumber
+            if tots2 <0:
+                tots2 =0
+            bill.insert(END,'-'*30+'\n')
+            bill.insert(END,'Initital Price:\t\t\t'+str(tots)+'\n')
+            bill.insert(END,'Tax:\t\t\t'+str(taxdata)+'%\n')
+            if discountdata !=0:
+                bill.insert(END,'Discount:\t\t\t-'+str(discountdata)+'%\n')
+            if discount != 0:
+                bill.insert(END,'Personal Discount:\t\t\t-'+str(discount)+'%\n')
+            if discount != 0:
+                bill.insert(END,'Personal Discount:\t\t\t-'+str(discountnumber)+'\n')
+            bill.insert(END,'Total Price:\t\t\t'+str(tots2)+'\n')
+            bill.insert(END,'-'*30+'\n')
+            bill.insert(END,'Status:\t\t'+str(status123)+'\n')
+            bill.insert(END,'Order Type:\t\t'+str(type123)+'\n')
+            
+            bill['state']='disabled'
     def gosettings():
         settings = Toplevel(ap)
         settings.title('Preferences')
@@ -86,11 +197,12 @@ def start():
 
         apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg='black',fg='white')
         apply.grid(row=5,column=0)
-        clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg='black')
+        clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg='black',command=newdatabase)
         clear.grid(row=5,column=1)
 
         settings.mainloop()
     def godiscounts():
+        global moneyentry,percententry
         discounts = Toplevel(ap)
         discounts.title('Discounts')
         discounts.geometry('900x475+0+150')
@@ -102,11 +214,13 @@ def start():
         percent.grid(row=0,column=0)
         percententry = Entry(frame1,font=('arial',30,'bold'))
         percententry.grid(row=0,column=1)
+        percententry.insert(0,'0')
 
         money =  Label(frame1,text='Discount(-AED)',font=('arial',30,'bold'),pady=20,padx=5)
         money.grid(row=1,column=0)
         moneyentry = Entry(frame1,font=('arial',30,'bold'))
         moneyentry.grid(row=1,column=1)
+        percententry.insert(0,'0')
 
         discounts.mainloop()
     def addinv():
@@ -170,14 +284,14 @@ def start():
     orderframe.place(x=0,y=120,height=100,width=900)
 
     ordernotext = Label(orderframe,text='Order No:',font=('Arial',12,'bold'),padx=25,pady=15)  #Order NO
-    orderno = Label(orderframe, text=ordernumber, font=('Arial',12,'bold'),fg='red')
+    orderno = Label(orderframe, text=str(getordernop()), font=('Arial',12,'bold'),fg='red')
 
     ordernotext.grid(row=0,column=0)
     orderno.grid(row=0,column=1)
 
     ordertype = Label(orderframe,text='Type:',font=('Arial',12,'bold'),padx=20)   #Type
     ordertypecombo = ttk.Combobox(orderframe,width=10, font=('Arial',12,'bold'),state='readonly')
-    ordertypecombo['values']=('Delivery','Dine-in','Take-Away')
+    ordertypecombo['values']=ordertypecombovalues
 
     ordertype.grid(row=1,column=0)
     ordertypecombo.grid(row=1,column=1)
@@ -234,8 +348,9 @@ def start():
     #SNO
     serialnumber = Text(itemsframe,width=4,height=15)
     serialnumber.grid(row=0,column=0)
-    serialnumber.insert('1.0','S.NO\n')
-    serialnumber.insert('2.0','='*4+'\n')
+    serialnumber.insert('1.0','-'*4+'\n')
+    serialnumber.insert('2.0','S.NO\n')
+    serialnumber.insert('3.0','-'*4+'\n')
     serialnumber['state']='disabled'
 
     #ITEMS
@@ -244,8 +359,9 @@ def start():
     
     ite = Text(iteframe,width=30,height=15)
     ite.grid(row=0,column=1)
-    ite.insert('1.0','Items\n')
-    ite.insert('2.0',"="*30+'\n')
+    ite.insert('1.0',"-"*30+'\n')
+    ite.insert('2.0','Items\n')
+    ite.insert('3.0',"-"*30+'\n')
     ite['state']='disabled'
 
     #PRICE
@@ -253,8 +369,9 @@ def start():
     price1frame.grid(row=0,column=2)
     price1 = Text(price1frame,width=5,height=15)
     price1.grid()
-    price1.insert('1.0','Price')
-    price1.insert('2.0','====='+'\n')
+    price1.insert('1.0','-----'+'\n')
+    price1.insert('2.0','Price')
+    price1.insert('3.0','-----'+'\n')
     price1['state']='disabled'
 
     #QUANTITY
@@ -262,8 +379,9 @@ def start():
     quantity1frame.grid(row=0,column=3)
     quantity = Text(quantity1frame,width=8,height=15)
     quantity.grid()
-    quantity.insert('1.0','Quantity')
-    quantity.insert('2.0','='*8+'\n')
+    quantity.insert('1.0','-'*8+'\n')
+    quantity.insert('2.0','Quantity')
+    quantity.insert('3.0','-'*8+'\n')
     quantity['state']='disabled'
 
     #TOTAL
@@ -271,8 +389,9 @@ def start():
     total1frame.grid(row=0,column=4)
     total1 = Text(total1frame,width=12,height=15)
     total1.grid()
-    total1.insert('1.0','Total Price ')
-    total1.insert('2.0','='*12+'\n')
+    total1.insert('1.0','-'*12+'\n')
+    total1.insert('2.0','Total Price \n')
+    total1.insert('3.0','-'*12+'\n')
     total1['state']='disabled'
 
 
@@ -287,10 +406,10 @@ def start():
     statuslabel.grid(row=0,column=0)
 
     paystatues = ttk.Combobox(statusframe,font=('Arial',12,'bold'),width=8,state='readonly')
-    paystatues['values'] = ('Paid','Not Paid')
+    paystatues['values'] = paystatuesvalues
     paystatues.grid(row=0,column=1)
 
-    generatebill = Button(billframe,text='Generate Bill', font=('Arial',12,'bold'),padx=67,fg='white',bg='black',command=lambda:placeorder)
+    generatebill = Button(billframe,text='Generate Bill', font=('Arial',12,'bold'),padx=67,fg='white',bg='black',command=placeorder)
     generatebill.grid(row=1)
 
     bill = Text(billframe, height=14,width=30,pady=10,state='disabled')
@@ -326,9 +445,12 @@ def start():
     ap.mainloop()
 
 def goneworder():
-    global ap, snumber
+    global ap, snumber,orderlist,tots,noofitems
     ap.destroy()
     snumber = 1
+    noofitems = 0
+    orderlist = []
+    tots=0
     start()
     
 start()
