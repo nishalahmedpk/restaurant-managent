@@ -1,4 +1,3 @@
-from cgitb import text
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -7,19 +6,16 @@ from database import *
 snumber = 1
 noofitems = 0
 orderlist = []
-path = 'orders.csv' 
-
-#discount part will do later
-try:
-    discount = int(percententry.get())
-except NameError:
-    discount = 0
-
-try:
-    discountnumber = int(moneyentry.get())
-except NameError:
-    discountnumber = 0
-
+o = []
+def getpath():
+    with open('preferences.dat','r+b') as x:
+        import pickle
+        dictonary = pickle.load(x)
+        return dictonary['Path']
+path = getpath()
+discount = 0
+discountnumber = 0
+        
 def start():
     global ap
     ap = Tk()
@@ -28,8 +24,39 @@ def start():
 
     #==========Commmands=================
 
-
-    def newdatabase():
+    def preferences():
+        #discount
+        discountdata = percententry1.get()
+        #currency
+        currency = curencyentry.get()
+        #tax%
+        taxx = taxentry.get()
+        #delivery fee
+        deliveryy = delvryentry.get()
+        #path
+        way = databasepath.get()
+        bob=0
+        with open('preferences.dat','w+b') as x:
+            import pickle
+            d={}
+            if discountdata=='' or currency=='' or deliveryy=='' or taxx=='' or way == '':
+                messagebox.showerror('Error','Enter All Fields')
+            else:
+                d['Discount'] = discountdata
+                d['Currency'] = currency
+                d['Delivery'] = deliveryy  #errror
+                d['Tax'] = taxx #error
+                d['Path'] = way+'.csv'
+                pickle.dump(d,x)
+                bob = 1
+        if bob == 1:
+            with open(way+'.csv','w+') as y:
+                import csv
+                w= csv.writer(y)
+                w.writerow(['S.NO','Mobile No','No Of Items','Items','Type','Status','Total Price'])
+                
+    
+    def newdatabase():  #Creates A New Database or Resets a Previous One
         
         global path
         import csv
@@ -55,7 +82,7 @@ def start():
             return s+1
 
     def addtodatabase():
-        global path,status123
+        global path,status123,o
         #adds to orders.csv
         #called in place order
         import csv
@@ -65,11 +92,6 @@ def start():
         type123 = ordertypecombo.get()
         status123 = paystatues.get()
         tots = 0
-        o = []
-        for i in orderlist:
-            if orderlist!=[]:
-                d = i[0]
-            o.append(d)
         for i in orderlist:
             bill.insert(END,i[0]+'\t\t\t'+i[1]+'\n')
             tots+=int(i[1])
@@ -78,7 +100,7 @@ def start():
             w.writerow([serialnumber,moobilenumber,noofitemsoredered,o,type123,status123,tots])
 
     def additem():
-        global snumber, orderlist,noofitems
+        global snumber, orderlist,noofitems,o
         import csv
         item = add.get()
         quantityget=qnty.get()
@@ -104,6 +126,8 @@ def start():
         tot = str(tot)
         total1.insert(END,tot+'\n')
 
+        if item not in o:
+            o.append(item)
         l1 = str(item)+' x'+str(quantityget)
         l2 = tot
         l = [l1,l2]
@@ -116,13 +140,10 @@ def start():
         total1['state']='disabled'   
         snumber+=1
         noofitems += 1*quantityget
-
-
-
     
     def placeorder():
-        global orderlist,discount,discountdata
-        if len(mobileno.get()) < 11 or ordertypecombo.get()=='' or paystatues.get()=='' or orderlist==[]:
+        global orderlist
+        if len(mobileno.get()) != 12 or ordertypecombo.get()=='' or paystatues.get()=='' or orderlist==[]:
             messagebox.showerror('Error','Enter All Fields Properly')
         else:
             addtodatabase()
@@ -143,25 +164,50 @@ def start():
             for i in orderlist:
                 bill.insert(END,i[0]+'\t\t\t'+i[1]+'\n')
                 tots+=int(i[1])
-            tots2 = tots + (tots*taxdata)/100 - (tots*discountdata)/100 - (tots*discount)/100 - discountnumber
+            tots2 = tots
             if tots2 <0:
                 tots2 =0
             bill.insert(END,'-'*30+'\n')
             bill.insert(END,'Initital Price:\t\t\t'+str(tots)+'\n')
-            bill.insert(END,'Tax:\t\t\t'+str(taxdata)+'%\n')
-            if discountdata !=0:
-                bill.insert(END,'Discount:\t\t\t-'+str(discountdata)+'%\n')
-            if discount != 0:
-                bill.insert(END,'Personal Discount:\t\t\t-'+str(discount)+'%\n')
-            if discount != 0:
-                bill.insert(END,'Personal Discount:\t\t\t-'+str(discountnumber)+'\n')
+            if ordertypecombo.get()=='Delivery':
+                deliveryfees = 0
+                with open('preferences.dat','r+b') as x:
+                    import pickle
+                    dictionary = pickle.load(x)
+                    deliveryfees = int(dictionary['Delivery'])
+                    bill.insert(END,'Delivery Fee:\t\t\t'+str(deliveryfees)+'\n')
+                    tots2+=deliveryfees
+            with open('preferences.dat','r+b') as x:
+                import pickle
+                dictionary = pickle.load(x)
+                disc = int(dictionary['Discount'])
+                tots2 -= (disc/100)*tots2
+            if disc != 0:
+                bill.insert(END,'Discount%:\t\t\t'+str(disc)+'\n')
+            with open('preferences.dat','r+b') as x:
+                import pickle
+                dictionary = pickle.load(x)
+                tax = int(dictionary['Tax'])
+                tots2 += (tax/100)*tots2
+            if tax != 0:
+                bill.insert(END,'Tax%:\t\t\t'+str(tax)+'\n')
+
+                   
             bill.insert(END,'Total Price:\t\t\t'+str(tots2)+'\n')
             bill.insert(END,'-'*30+'\n')
             bill.insert(END,'Status:\t\t'+str(status123)+'\n')
             bill.insert(END,'Order Type:\t\t'+str(type123)+'\n')
-            
+            if ordertypecombo.get()=='Delivery':
+                pass
+
             bill['state']='disabled'
     def gosettings():
+        global percententry1,curencyentry,taxentry,delvryentry,databasepath
+
+        file = open('preferences.dat','r+b')
+        import pickle
+        dictonary = pickle.load(file) 
+
         settings = Toplevel(ap)
         settings.title('Preferences')
         settings.geometry('900x475+0+150')
@@ -169,37 +215,45 @@ def start():
         frame1 = Frame(settings,bd=5,height=375,width=800,relief='ridge',padx=20,pady=20)
         frame1.place(anchor=CENTER,relx=0.5, rely=0.5)
 
-        percent =  Label(frame1,text='Discount(%):',font=('arial',20,'bold'),pady=5,padx=5)
-        percent.grid(row=0,column=0)
-        percententry = Entry(frame1,font=('arial',20,'bold'))
-        percententry.grid(row=0,column=1)
+        percent1 =  Label(frame1,text='Discount(%):',font=('arial',20,'bold'),pady=5,padx=5)
+        percent1.grid(row=0,column=0)
+        percententry1 = Entry(frame1,font=('arial',20,'bold'))
+        percententry1.grid(row=0,column=1)
+        percententry1.insert(0,dictonary['Discount'])
 
         curency =  Label(frame1,text='Currency:',font=('arial',20,'bold'),pady=5,padx=5)
         curency.grid(row=1,column=0)
-        curencyentry = ttk.Combobox(frame1,font=('arial',20,'bold'),state='readonly',width=19)
+        curencyentry = ttk.Combobox(frame1,font=('arial',20,'bold'),width=19)
         curencyentry['values'] = currencies
         curencyentry.grid(row=1,column=1)
+        curencyentry.insert(0,dictonary['Currency'])
+        curencyentry['state'] = 'readonly'
 
         tax =  Label(frame1,text='Tax(%):',font=('arial',20,'bold'),pady=5,padx=5)
         tax.grid(row=2,column=0)
         taxentry = Entry(frame1,font=('arial',20,'bold'))
         taxentry.grid(row=2,column=1)
+        taxentry.insert(0,dictonary['Tax'])
 
         delvry =  Label(frame1,text='Delivery Fee:',font=('arial',20,'bold'),pady=5,padx=5)
         delvry.grid(row=3,column=0)
         delvryentry = Entry(frame1,font=('arial',20,'bold'))
         delvryentry.grid(row=3,column=1)
+        delvryentry.insert(0,dictonary['Delivery'])
 
         data = Label(frame1,font=('arial',20,'bold'),text='Path:',pady=5,padx=5)
         databasepath = Entry(frame1,font=('arial',20,'bold'))
         data.grid(row=4,column=0)
         databasepath.grid(row=4,column=1)
+        databasepath.insert(0,str(dictonary['Path'])[:-4])
 
-        apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg='black',fg='white')
+        apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg='black',fg='white',command=preferences)
         apply.grid(row=5,column=0)
         clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg='black',command=newdatabase)
         clear.grid(row=5,column=1)
 
+
+        file.close()
         settings.mainloop()
     def godiscounts():
         global moneyentry,percententry
@@ -451,6 +505,7 @@ def goneworder():
     noofitems = 0
     orderlist = []
     tots=0
+    o=[]
     start()
     
 start()
