@@ -7,14 +7,22 @@ snumber = 1
 noofitems = 0
 orderlist = []
 o = []
+personaldiscountnumber = 0
+personaldiscount = 0
+
+
 def getpath():
     with open('preferences.dat','r+b') as x:
         import pickle
         dictonary = pickle.load(x)
+        try:
+            with open(dictonary['Path'],'r+') as x:
+                x.close
+        except FileNotFoundError:
+            with open(dictonary['Path'],'w+') as x:
+                x.close()
         return dictonary['Path']
 path = getpath()
-discount = 0
-discountnumber = 0
         
 def start():
     global ap
@@ -95,6 +103,8 @@ def start():
         for i in orderlist:
             bill.insert(END,i[0]+'\t\t\t'+i[1]+'\n')
             tots+=int(i[1])
+        if paystatues.get()=='Credit':
+            tots = -(tots)     
         with open(path,'a+',newline='') as x:
             w = csv.writer(x)
             w.writerow([serialnumber,moobilenumber,noofitemsoredered,o,type123,status123,tots])
@@ -142,8 +152,14 @@ def start():
         noofitems += 1*quantityget
     
     def placeorder():
+        dog =0
         global orderlist
-        if len(mobileno.get()) != 12 or ordertypecombo.get()=='' or paystatues.get()=='' or orderlist==[]:
+        try:
+            int(mobileno.get())
+        except ValueError:
+            dog =1
+
+        if len(mobileno.get()) != 12 or dog==1 or ordertypecombo.get()=='' or paystatues.get()=='' or orderlist==[]:
             messagebox.showerror('Error','Enter All Fields Properly')
         else:
             addtodatabase()
@@ -177,6 +193,13 @@ def start():
                     deliveryfees = int(dictionary['Delivery'])
                     bill.insert(END,'Delivery Fee:\t\t\t'+str(deliveryfees)+'\n')
                     tots2+=deliveryfees
+            if personaldiscountnumber != 0:
+                tots2-=personaldiscountnumber
+                bill.insert(END,'Personal Discount:\t\t\t'+str(personaldiscountnumber)+'\n')
+            if personaldiscount != 0:
+                tots2= tots2 - tots*(personaldiscount/100)
+                bill.insert(END,'Personal Discount%:\t\t\t'+str(personaldiscount)+'\n')
+
             with open('preferences.dat','r+b') as x:
                 import pickle
                 dictionary = pickle.load(x)
@@ -191,8 +214,8 @@ def start():
                 tots2 += (tax/100)*tots2
             if tax != 0:
                 bill.insert(END,'Tax%:\t\t\t'+str(tax)+'\n')
-
-                   
+            if paystatues.get()=='Credit':
+                tots2 = -(tots2)                  
             bill.insert(END,'Total Price:\t\t\t'+str(tots2)+'\n')
             bill.insert(END,'-'*30+'\n')
             bill.insert(END,'Status:\t\t'+str(status123)+'\n')
@@ -255,13 +278,19 @@ def start():
 
         file.close()
         settings.mainloop()
+
+    def personaldiscountsupdate():
+        global personaldiscountnumber,personaldiscount
+        personaldiscountnumber += int(moneyentry.get())
+        personaldiscount = int(percententry.get())
+
     def godiscounts():
         global moneyentry,percententry
         discounts = Toplevel(ap)
         discounts.title('Discounts')
         discounts.geometry('900x475+0+150')
 
-        frame1 = Frame(discounts,bd=5,height=375,width=800,relief='ridge', padx=20)
+        frame1 = Frame(discounts,bd=5,height=375,width=800,relief='ridge', padx=20,pady=20)
         frame1.place(anchor=CENTER,relx=0.5, rely=0.5)
 
         percent =  Label(frame1,text='Discount(%)',font=('arial',30,'bold'),pady=20,padx=5)
@@ -274,7 +303,10 @@ def start():
         money.grid(row=1,column=0)
         moneyentry = Entry(frame1,font=('arial',30,'bold'))
         moneyentry.grid(row=1,column=1)
-        percententry.insert(0,'0')
+        moneyentry.insert(0,'0')
+
+        personaldiscountbutton = Button(frame1,text='Apply',font=('arial',30,'bold'),pady=-5,padx=150,fg='white',bg='black',command=personaldiscountsupdate)
+        personaldiscountbutton.grid(row=2,column=1)
 
         discounts.mainloop()
     def addinv():
@@ -459,6 +491,7 @@ def start():
     statuslabel = Label(statusframe,text='Status:',font=('Arial',12,'bold'),pady=25)
     statuslabel.grid(row=0,column=0)
 
+    global paystatues
     paystatues = ttk.Combobox(statusframe,font=('Arial',12,'bold'),width=8,state='readonly')
     paystatues['values'] = paystatuesvalues
     paystatues.grid(row=0,column=1)
@@ -499,7 +532,7 @@ def start():
     ap.mainloop()
 
 def goneworder():
-    global ap, snumber,orderlist,tots,noofitems
+    global ap, snumber,orderlist,tots,noofitems,personaldiscountnumber, o,personaldiscount
     ap.destroy()
     snumber = 1
     noofitems = 0
@@ -507,5 +540,6 @@ def goneworder():
     tots=0
     o=[]
     start()
-    
+    personaldiscountnumber = 0
+    personaldiscount = 0
 start()
