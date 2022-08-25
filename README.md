@@ -1,12 +1,12 @@
-# Restaurant Sales App
-## Features:
+<h1>Restaurant Sales App</h1>
+<h2>Features:</h2>
 <ul>
-<li> Add Discount 
-<li> Add Personal Discount
-<li> Add Delivery Fee
-<li> Generate Bill
+<li>Add Discount 
+<li>Add Personal Discount
+<li>Add Delivery Fee
+<li>Generate Bill
 </ul>
-## Cons:
+<h2>Cons:</h2>
 <ul>
-<li> Can't delete Order
+<li>Can't delete Order
 </ul>
