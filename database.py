@@ -1,5 +1,5 @@
+import csv
 def getfooditems():
-    import csv 
     l = []
     with open('fooditems.csv','r+') as x:
         r = csv.reader(x)
@@ -11,7 +11,6 @@ def getfooditems():
     return l
 
 def getfoodcategory():
-    import csv 
     l = []
     with open('fooditems.csv','r+') as x:
         r = csv.reader(x)
