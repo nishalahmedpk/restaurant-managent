@@ -1,8 +1,12 @@
 # Restaurant Sales App
 ## Features:
-### Add Discount 
-### Add Personal Discount
-### Add Delivery Fee
-### Generate Bill
+<ul>
+<li> Add Discount 
+<li> Add Personal Discount
+<li> Add Delivery Fee
+<li> Generate Bill
+</ul>
 ## Cons:
-### Cant Delete An Order
+<ul>
+<li> Can't delete Order
+</ul>
