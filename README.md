@@ -8,5 +8,5 @@
 </ul>
 <h2>Cons:</h2>
 <ul>
-<li>Can't delete Order
+<li>Can't Delete Order
 </ul>
