@@ -1,6 +1,5 @@
 from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 from database import *
 
 snumber = 1
@@ -521,7 +520,7 @@ def start():
     neworder.place(x=365,y=5)
 
 
-    about2 = Label(bottomframe,text='SOOPERMAN',font=('Roberto',20,'bold'),fg='red')
+    about2 = Label(bottomframe,text='SOOPERMAN and JOHNNY',font=('Roberto',10,'bold'),fg='red')
     about2.place(y=30,x=700)
 
     about = Label(bottomframe,text='Developed by',font=('Arial',12,'bold'))
