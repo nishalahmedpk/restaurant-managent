@@ -37,4 +37,3 @@ def getfooditems():  #Not Working
     x=list(cur.fetchall())
     con.close()
     return x
-print(getfooditems)

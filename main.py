@@ -1,8 +1,10 @@
+from operator import imod
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from database import *
 from mysqldatabase import *
+#from screensize import*
 
 snumber = 1
 noofitems = 0
@@ -28,7 +30,7 @@ path = getpath()
 def start():
     global ap,xaxis
     ap = Tk()
-    #ap.tk_setPalette('black')
+    ap.tk_setPalette('paleturquoise')
     ap.title('Restaurant Management 0.1 Beta')
     ap.geometry('900x700+0+0')
     ap.state('zoomed')
@@ -148,7 +150,6 @@ def start():
             
             #bill
             bill['state']='normal'
-            restaurantname='RESTAURANT NAME'
             bill.insert(END,restaurantname.center(30))
             bill.insert(END,'-'*30+'\n')
             bill.insert(END,'Item\t\t\tPrice\n')
@@ -210,7 +211,8 @@ def start():
 
         settings = Toplevel(ap)
         settings.title('Preferences')
-        settings.geometry('900x475+0+150')
+        settings.geometry(f'900x475+0+150')
+        settings.state('zoomed')
 
         frame1 = Frame(settings,bd=5,height=375,width=800,relief='ridge',padx=20,pady=20)
         frame1.place(anchor=CENTER,relx=0.5, rely=0.5)
@@ -265,7 +267,8 @@ def start():
         global moneyentry,percententry
         discounts = Toplevel(ap)
         discounts.title('Discounts')
-        discounts.geometry('900x475+0+150')
+        discounts.geometry(f'900x475+0+150')
+        discounts.state('zoomed')
 
         frame1 = Frame(discounts,bd=5,height=375,width=800,relief='ridge', padx=20,pady=20)
         frame1.place(anchor=CENTER,relx=0.5, rely=0.5)
@@ -300,6 +303,7 @@ def start():
         inv = Toplevel(ap)
         inv.title('Add Inventory')
         inv.geometry(f'900x475+0+150')
+        inv.state('zoomed')
         
         frame1 = Frame(inv,bd=5,height=375,width=800,relief='ridge',padx=20,pady=20)
         frame1.place(anchor=CENTER,relx=0.5, rely=0.5)
@@ -338,12 +342,12 @@ def start():
 
 
     #Header
-    headingframe = Label(app,bd=20,text='RESTAURANT',fg='white',font=('arial',50,'bold'),bg='black')
+    headingframe = Label(app,bd=20,text=restaurantname,fg='white',bg=foreground123,font=('arial',50,'bold'))
     headingframe.pack(side='top',fill='x')
 
     #======================Order Details======================
 
-    orderframe = LabelFrame(app,bd=5,relief='ridge')
+    orderframe = LabelFrame(app,bd=5,relief='flat')
     orderframe.place(x=0,y=120,height=100,width=900)
 
     ordernotext = Label(orderframe,text='Order No:',font=('Arial',12,'bold'),padx=25,pady=15)  #Order NO
@@ -376,12 +380,12 @@ def start():
 
     #==================================Order Taking=======================
 
-    takeframe = LabelFrame(app,bd=5,relief='ridge')
+    takeframe = LabelFrame(app,bd=5,relief='flat',bg='paleturquoise')
     takeframe.place(x=0,y=220,height=400,width=900)
 
     #Add order
-    addframe = LabelFrame(takeframe,bd=5,relief='ridge') 
-    addframe.place(x=5,y=5,width=600,height=80)
+    addframe = LabelFrame(takeframe,bd=5,relief='ridge',bg='paleturquoise') 
+    addframe.place(x=0,y=5,width=600,height=80)
 
     addlabel = Label(addframe,text='Add Item:', font=('Arial',12,'bold'),padx=20,pady=25)
     addlabel.grid(row=0,column=0)
@@ -405,7 +409,7 @@ def start():
 
     #Items
     itemsframe = LabelFrame(takeframe,bd=5,relief='ridge',padx=10,pady=10)
-    itemsframe.place(x=5,y=90,width=600,height=295)
+    itemsframe.place(x=0,y=90,width=600,height=295)
 
 
     #SNO
@@ -482,19 +486,19 @@ def start():
 
     #===============================Bottom Part================================
 
-    bottomframe = LabelFrame(app,bd=5,relief='ridge')
+    bottomframe = LabelFrame(app,bd=5,relief='flat')
     bottomframe.place(x=0,y=620,height=80,width=900)
 
-    newfood = Button(bottomframe,text='Add To Inventory',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black',command=addinv)
+    newfood = Button(bottomframe,text='Add To Inventory',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg=foreground123,command=addinv)
     newfood.place(x=5,y=5)
 
-    settingsbutton = Button(bottomframe,text='Preferences',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black',command=gosettings)
+    settingsbutton = Button(bottomframe,text='Preferences',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg=foreground123,command=gosettings)
     settingsbutton.place(x=205,y=5)
 
-    discounts = Button(bottomframe,text='Discounts',font=('Arial',12,'bold'),padx=25,pady=15,fg='red',bg='black',command=godiscounts)
+    discounts = Button(bottomframe,text='Discounts',font=('Arial',12,'bold'),padx=25,pady=15,fg='red',bg=foreground123,command=godiscounts)
     discounts.place(x=515,y=5)
 
-    neworder = Button(bottomframe,text='New Order',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg='black',command=goneworder)
+    neworder = Button(bottomframe,text='New Order',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg=foreground123,command=goneworder)
     neworder.place(x=365,y=5)
 
 
@@ -519,4 +523,5 @@ def goneworder():
     start()
     personaldiscountnumber = 0
     personaldiscount = 0
+
 start()

@@ -34,4 +34,8 @@ ordertypecombovalues = ['Dine-in','Take-Away','Delivery']
 
 paystatuesvalues = ('Paid','Not Paid','Credit')
 
+restaurantname='RESTAURANT NAME'
+
+foreground123 = 'DarkSlateGray'
+
   #can change in preferences hopefully
