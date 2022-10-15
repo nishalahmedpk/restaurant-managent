@@ -1,6 +1,8 @@
 from tkinter import *
-from tkinter import ttk, messagebox
+from tkinter import ttk
+from tkinter import messagebox
 from database import *
+from mysqldatabase import *
 
 snumber = 1
 noofitems = 0
@@ -8,7 +10,7 @@ orderlist = []
 o = []
 personaldiscountnumber = 0
 personaldiscount = 0
-
+table = 'july'
 
 def getpath():
     with open('preferences.dat','r+b') as x:
@@ -22,12 +24,14 @@ def getpath():
                 x.close()
         return dictonary['Path']
 path = getpath()
-        
+
 def start():
-    global ap
+    global ap,xaxis
     ap = Tk()
+    #ap.tk_setPalette('black')
     ap.title('Restaurant Management 0.1 Beta')
     ap.geometry('900x700+0+0')
+    ap.state('zoomed')
 
     #==========Commmands=================
 
@@ -61,39 +65,13 @@ def start():
                 import csv
                 w= csv.writer(y)
                 w.writerow(['S.NO','Mobile No','No Of Items','Items','Type','Status','Total Price'])
-                
-    
-    def newdatabase():  #Creates A New Database or Resets a Previous One
-        
-        global path
-        import csv
-        with open(path,'w+',newline='') as x:
-            w= csv.writer(x)
-            w.writerow(['S.NO','Mobile No','No Of Items','Items','Type','Status','Total Price'])
-        
-    def getordernop():
-        global path
-        import csv
-        with open(path,'r+',newline='') as x:
-            r = csv.reader(x)
-            s=0
-            for i in r:
-
-                if i == []:
-                    newdatabase()
-                    s=0
-                elif i[0]=='S.NO':
-                    s=0
-                else:
-                    s = int(i[0])
-            return s+1
 
     def addtodatabase():
         global path,status123,o
         #adds to orders.csv
         #called in place order
         import csv
-        serialnumber = getordernop()
+        serialnumber = getordernop(table)
         moobilenumber = mobileno.get()
         noofitemsoredered = noofitems
         type123 = ordertypecombo.get()
@@ -321,7 +299,7 @@ def start():
 
         inv = Toplevel(ap)
         inv.title('Add Inventory')
-        inv.geometry('900x475+0+150')
+        inv.geometry(f'900x475+0+150')
         
         frame1 = Frame(inv,bd=5,height=375,width=800,relief='ridge',padx=20,pady=20)
         frame1.place(anchor=CENTER,relx=0.5, rely=0.5)
@@ -369,7 +347,7 @@ def start():
     orderframe.place(x=0,y=120,height=100,width=900)
 
     ordernotext = Label(orderframe,text='Order No:',font=('Arial',12,'bold'),padx=25,pady=15)  #Order NO
-    orderno = Label(orderframe, text=str(getordernop()), font=('Arial',12,'bold'),fg='red')
+    orderno = Label(orderframe, text=str(getordernop(table)), font=('Arial',12,'bold'),fg='red')
 
     ordernotext.grid(row=0,column=0)
     orderno.grid(row=0,column=1)
@@ -520,11 +498,11 @@ def start():
     neworder.place(x=365,y=5)
 
 
-    about2 = Label(bottomframe,text='SOOPERMAN and JOHNNY',font=('Roberto',10,'bold'),fg='red')
-    about2.place(y=30,x=700)
+    about2 = Label(bottomframe,text='Nishal',font=('Roberto',20,'bold'))
+    about2.place(y=30,x=790)
 
-    about = Label(bottomframe,text='Developed by',font=('Arial',12,'bold'))
-    about.place(y=5,x=770)
+    about = Label(bottomframe,text='Jonathan &',font=('Arial',12,'bold'))
+    about.place(y=5,x=785)
 
 
 
