@@ -37,3 +37,47 @@ def getfooditems():  #Not Working
     x=list(cur.fetchall())
     con.close()
     return x
+
+#Returns Full List For additems():
+def getallfoooditems():
+    con = connect(host=host, user=user,password=password,database='restaurant_management')
+    cur = con.cursor()
+    cur.execute("Select * from fooditems")
+    x=list(cur.fetchall())
+    con.close()
+    return x
+
+def getfoodcategory():
+    con = connect(host=host, user=user,password=password,database='restaurant_management')
+    cur = con.cursor()
+    cur.execute("Select distinct Category from fooditems")
+    x=list(cur.fetchall())
+    con.close()
+    return x
+
+def addtodata1(name,price,category):
+    con = connect(host=host, user=user,password=password,database='restaurant_management')
+    cur = con.cursor()
+    cur.execute(f"Insert into fooditems values('{name}',{price},'{category}')")
+    con.commit()
+    con.close()
+
+fooditems = getfooditems()
+
+listofallfooditems = getallfoooditems()
+
+currencies = ['AED','INR', 'USD']
+
+foodcategory = getfoodcategory()
+
+ordertypecombovalues = ['Dine-in','Take-Away','Delivery']
+
+paystatuesvalues = ('Paid','Not Paid','Credit')
+
+restaurantname='Green City'
+
+foreground123 = 'DarkSlateGray'
+
+background123 = 'paleturquoise'
+
+numbers = list(range(1,14))

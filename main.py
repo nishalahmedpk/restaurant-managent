@@ -1,8 +1,6 @@
-from operator import imod
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from database import *
 from mysqldatabase import *
 #from screensize import*
 
@@ -30,7 +28,7 @@ path = getpath()
 def start():
     global ap,xaxis
     ap = Tk()
-    ap.tk_setPalette('paleturquoise')
+    ap.tk_setPalette(background123)
     ap.title('Restaurant Management 0.1 Beta')
     ap.geometry('900x700+0+0')
     ap.state('zoomed')
@@ -93,11 +91,9 @@ def start():
         import csv
         item = add.get()
         quantityget=qnty.get()
-        with open('fooditems.csv','r+') as x:
-            r = csv.reader(x)
-            for i in r:
+        for i in listofallfooditems:
                 if i[0]==item:
-                    price = i[1]
+                    price = str(i[1])
         serialnumber['state'] = 'normal'
         ite['state'] = 'normal'
         price1['state']='normal'
@@ -249,9 +245,9 @@ def start():
         databasepath.grid(row=4,column=1)
         databasepath.insert(0,str(dictonary['Path'])[:-4])
 
-        apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg='black',fg='white',command=preferences)
+        apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg=foreground123,fg='white',command=preferences)
         apply.grid(row=5,column=0)
-        clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg='black',command=newdatabase)
+        clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg=foreground123,command=newdatabase)
         clear.grid(row=5,column=1)
 
 
@@ -285,20 +281,17 @@ def start():
         moneyentry.grid(row=1,column=1)
         moneyentry.insert(0,'0')
 
-        personaldiscountbutton = Button(frame1,text='Apply',font=('arial',30,'bold'),pady=-5,padx=150,fg='white',bg='black',command=personaldiscountsupdate)
+        personaldiscountbutton = Button(frame1,text='Apply',font=('arial',30,'bold'),pady=-5,padx=150,fg='white',bg=foreground123,command=personaldiscountsupdate)
         personaldiscountbutton.grid(row=2,column=1)
 
         discounts.mainloop()
     def addinv():
 
         def addtodata():
-            import csv 
             name = foodentry.get()
-            price = priceentry.get()
+            price = int(priceentry.get())
             category = catentry.get()
-            with open('fooditems.csv','a+',newline='') as x:    
-                w = csv.writer(x)
-                w.writerow([name,price,category])
+            addtodata1(name,price,category)
 
         inv = Toplevel(ap)
         inv.title('Add Inventory')
@@ -329,7 +322,7 @@ def start():
         priceentry = Entry(frame1,font=('arial',20,'bold'))
         priceentry.grid(row=2,column=1)
         
-        add = Button(frame1,text='Add Item',font=('arial',20,'bold'),padx=80,bg='black',fg='white', command=addtodata)
+        add = Button(frame1,text='Add Item',font=('arial',20,'bold'),padx=80,bg=foreground123,fg='white', command=addtodata)
         add.grid(row=4,column=1)
 
         inv.mainloop()
@@ -380,11 +373,11 @@ def start():
 
     #==================================Order Taking=======================
 
-    takeframe = LabelFrame(app,bd=5,relief='flat',bg='paleturquoise')
+    takeframe = LabelFrame(app,bd=5,relief='flat',bg=background123)
     takeframe.place(x=0,y=220,height=400,width=900)
 
     #Add order
-    addframe = LabelFrame(takeframe,bd=5,relief='ridge',bg='paleturquoise') 
+    addframe = LabelFrame(takeframe,bd=5,relief='ridge',bg=background123) 
     addframe.place(x=0,y=5,width=600,height=80)
 
     addlabel = Label(addframe,text='Add Item:', font=('Arial',12,'bold'),padx=20,pady=25)
@@ -404,7 +397,7 @@ def start():
     blank = Label(addframe,text='',padx=10)
     blank.grid(row=0,column=4)
 
-    addbutton = Button(addframe,text='Add', font=('Arial',12,'bold'),padx=20,fg='white',bg='black',command=additem)
+    addbutton = Button(addframe,text='Add', font=('Arial',12,'bold'),padx=20,fg='white',bg=foreground123,command=additem)
     addbutton.grid(row=0,column=5)
 
     #Items
@@ -477,7 +470,7 @@ def start():
     paystatues['values'] = paystatuesvalues
     paystatues.grid(row=0,column=1)
 
-    generatebill = Button(billframe,text='Generate Bill', font=('Arial',12,'bold'),padx=67,fg='white',bg='black',command=placeorder)
+    generatebill = Button(billframe,text='Generate Bill', font=('Arial',12,'bold'),padx=67,fg='white',bg=foreground123,command=placeorder)
     generatebill.grid(row=1)
 
     bill = Text(billframe, height=14,width=30,pady=10,state='disabled')
