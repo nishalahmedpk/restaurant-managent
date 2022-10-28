@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from mysqldatabase import *
-#from screensize import*
+
 
 snumber = 1
 noofitems = 0
@@ -10,7 +10,6 @@ orderlist = []
 o = []
 personaldiscountnumber = 0
 personaldiscount = 0
-table = 'july'
 
 def getpath():
     with open('preferences.dat','r+b') as x:
@@ -23,7 +22,9 @@ def getpath():
             with open(dictonary['Path'],'w+') as x:
                 x.close()
         return dictonary['Path']
-path = getpath()
+
+table = getpath()
+new_user(table)
 
 def start():
     global ap,xaxis
@@ -57,20 +58,11 @@ def start():
                 d['Currency'] = currency
                 d['Delivery'] = deliveryy  #errror
                 d['Tax'] = taxx #error
-                d['Path'] = way+'.csv'
+                d['Path'] = way
                 pickle.dump(d,x)
-                bob = 1
-        if bob == 1:
-            with open(way+'.csv','w+') as y:
-                import csv
-                w= csv.writer(y)
-                w.writerow(['S.NO','Mobile No','No Of Items','Items','Type','Status','Total Price'])
-
+                
     def addtodatabase():
-        global path,status123,o
-        #adds to orders.csv
-        #called in place order
-        import csv
+        global status123,o
         serialnumber = getordernop(table)
         moobilenumber = mobileno.get()
         noofitemsoredered = noofitems
@@ -82,49 +74,51 @@ def start():
             tots+=int(i[1])
         if paystatues.get()=='Credit':
             tots = -(tots)     
-        with open(path,'a+',newline='') as x:
-            w = csv.writer(x)
-            w.writerow([serialnumber,moobilenumber,noofitemsoredered,o,type123,status123,tots])
+        addtodatabase1(int(serialnumber),moobilenumber,int(noofitemsoredered),o,type123,status123,tots,table)
 
     def additem():
         global snumber, orderlist,noofitems,o
-        import csv
         item = add.get()
         quantityget=qnty.get()
-        for i in listofallfooditems:
-                if i[0]==item:
-                    price = str(i[1])
-        serialnumber['state'] = 'normal'
-        ite['state'] = 'normal'
-        price1['state']='normal'
-        quantity['state']='normal'
-        total1['state']='normal'
+        try:
+            xyza =int(quantityget)
+        except ValueError:
+            messagebox.showerror('Error','Enter Quantity')
+        else:
+            for i in listofallfooditems:
+                    if i[0]==item:
+                        price = str(i[1])
+            serialnumber['state'] = 'normal'
+            ite['state'] = 'normal'
+            price1['state']='normal'
+            quantity['state']='normal'
+            total1['state']='normal'
 
 
-        serialnumber.insert(END,str(snumber)+'\n')
-        ite.insert(END,item+'\n')
-        price1.insert(END,price+'\n')
-        quantity.insert(END,quantityget+'\n')
-        price = int(price)
-        quantityget = int(quantityget)
-        tot = price*quantityget
-        tot = str(tot)
-        total1.insert(END,tot+'\n')
+            serialnumber.insert(END,str(snumber)+'\n')
+            ite.insert(END,item+'\n')
+            price1.insert(END,price+'\n')
+            quantity.insert(END,quantityget+'\n')
+            price = int(price)
+            quantityget = int(quantityget)
+            tot = price*quantityget
+            tot = str(tot)
+            total1.insert(END,tot+'\n')
 
-        if item not in o:
-            o.append(item)
-        l1 = str(item)+' x'+str(quantityget)
-        l2 = tot
-        l = [l1,l2]
-        orderlist.append(l)
-   
-        serialnumber['state'] = 'normal'
-        ite['state'] = 'disabled'
-        price1['state']='disabled'
-        quantity['state']='disabled'
-        total1['state']='disabled'   
-        snumber+=1
-        noofitems += 1*quantityget
+            if item not in o:
+                o.append(item)
+            l1 = str(item)+' x'+str(quantityget)
+            l2 = tot
+            l = [l1,l2]
+            orderlist.append(l)
+    
+            serialnumber['state'] = 'normal'
+            ite['state'] = 'disabled'
+            price1['state']='disabled'
+            quantity['state']='disabled'
+            total1['state']='disabled'   
+            snumber+=1
+            noofitems += 1*quantityget
     
     def placeorder():
         dog =0
@@ -133,7 +127,6 @@ def start():
             int(mobileno.get())
         except ValueError:
             dog =1
-
         if len(mobileno.get()) != 12 or dog==1 or ordertypecombo.get()=='' or paystatues.get()=='' or orderlist==[]:
             messagebox.showerror('Error','Enter All Fields Properly')
         else:
@@ -160,7 +153,6 @@ def start():
             bill.insert(END,'-'*30+'\n')
             bill.insert(END,'Initital Price:\t\t\t'+str(tots)+'\n')
             if ordertypecombo.get()=='Delivery':
-                deliveryfees = 0
                 with open('preferences.dat','r+b') as x:
                     import pickle
                     dictionary = pickle.load(x)
@@ -171,7 +163,7 @@ def start():
                 tots2-=personaldiscountnumber
                 bill.insert(END,'Personal Discount:\t\t\t'+str(personaldiscountnumber)+'\n')
             if personaldiscount != 0:
-                tots2= tots2 - tots*(personaldiscount/100)
+                tots2= tots2 - tots*personaldiscount*0.01
                 bill.insert(END,'Personal Discount%:\t\t\t'+str(personaldiscount)+'\n')
 
             with open('preferences.dat','r+b') as x:
@@ -243,11 +235,11 @@ def start():
         databasepath = Entry(frame1,font=('arial',20,'bold'))
         data.grid(row=4,column=0)
         databasepath.grid(row=4,column=1)
-        databasepath.insert(0,str(dictonary['Path'])[:-4])
+        databasepath.insert(0,str(table))
 
         apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg=foreground123,fg='white',command=preferences)
         apply.grid(row=5,column=0)
-        clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg=foreground123,command=newdatabase)
+        clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg=foreground123,command=newdatabase(databasepath.get()))
         clear.grid(row=5,column=1)
 
 
@@ -291,7 +283,10 @@ def start():
             name = foodentry.get()
             price = int(priceentry.get())
             category = catentry.get()
-            addtodata1(name,price,category)
+            try:    
+                addtodata1(name,price,category)
+            except ValueError:
+                messagebox.ERROR('Enter Fields Properly')
 
         inv = Toplevel(ap)
         inv.title('Add Inventory')
@@ -500,9 +495,6 @@ def start():
 
     about = Label(bottomframe,text='Jonathan &',font=('Arial',12,'bold'))
     about.place(y=5,x=785)
-
-
-
     ap.mainloop()
 
 def goneworder():
