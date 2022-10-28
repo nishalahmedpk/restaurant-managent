@@ -7,7 +7,7 @@ from mysqldatabase import *
 snumber = 1
 noofitems = 0
 orderlist = []
-o = []
+listofallitmes = []
 personaldiscountnumber = 0
 personaldiscount = 0
 
@@ -29,7 +29,7 @@ new_user(table)
 def start():
     global ap,xaxis
     ap = Tk()
-    ap.tk_setPalette(background123)
+    ap.tk_setPalette(background)
     ap.title('Restaurant Management 0.1 Beta')
     ap.geometry('900x700+0+0')
     ap.state('zoomed')
@@ -62,22 +62,22 @@ def start():
                 pickle.dump(d,x)
                 
     def addtodatabase():
-        global status123,o
+        global status123,listofallitmes
         serialnumber = getordernop(table)
         moobilenumber = mobileno.get()
         noofitemsoredered = noofitems
         type123 = ordertypecombo.get()
         status123 = paystatues.get()
-        tots = 0
+        initialtotal = 0
         for i in orderlist:
             bill.insert(END,i[0]+'\t\t\t'+i[1]+'\n')
-            tots+=int(i[1])
+            initialtotal+=int(i[1])
         if paystatues.get()=='Credit':
-            tots = -(tots)     
-        addtodatabase1(int(serialnumber),moobilenumber,int(noofitemsoredered),o,type123,status123,tots,table)
+            initialtotal = -(initialtotal)     
+        addtodatabase1(int(serialnumber),moobilenumber,int(noofitemsoredered),listofallitmes,type123,status123,initialtotal,table)
 
     def additem():
-        global snumber, orderlist,noofitems,o
+        global snumber, orderlist,noofitems,listofallitmes
         item = add.get()
         quantityget=qnty.get()
         try:
@@ -105,8 +105,8 @@ def start():
             tot = str(tot)
             total1.insert(END,tot+'\n')
 
-            if item not in o:
-                o.append(item)
+            if item not in listofallitmes:
+                listofallitmes.append(item)
             l1 = str(item)+' x'+str(quantityget)
             l2 = tot
             l = [l1,l2]
@@ -143,46 +143,46 @@ def start():
             bill.insert(END,'-'*30+'\n')
             bill.insert(END,'Item\t\t\tPrice\n')
             bill.insert(END,'-'*30+'\n')
-            tots = 0
+            initialtotal = 0
             for i in orderlist:
                 bill.insert(END,i[0]+'\t\t\t'+i[1]+'\n')
-                tots+=int(i[1])
-            tots2 = tots
-            if tots2 <0:
-                tots2 =0
+                initialtotal+=int(i[1])
+            finaltotal = initialtotal
+            if finaltotal <0:
+                finaltotal =0
             bill.insert(END,'-'*30+'\n')
-            bill.insert(END,'Initital Price:\t\t\t'+str(tots)+'\n')
+            bill.insert(END,'Initital Price:\t\t\t'+str(initialtotal)+'\n')
             if ordertypecombo.get()=='Delivery':
                 with open('preferences.dat','r+b') as x:
                     import pickle
                     dictionary = pickle.load(x)
                     deliveryfees = int(dictionary['Delivery'])
                     bill.insert(END,'Delivery Fee:\t\t\t'+str(deliveryfees)+'\n')
-                    tots2+=deliveryfees
+                    finaltotal+=deliveryfees
             if personaldiscountnumber != 0:
-                tots2-=personaldiscountnumber
+                finaltotal-=personaldiscountnumber
                 bill.insert(END,'Personal Discount:\t\t\t'+str(personaldiscountnumber)+'\n')
             if personaldiscount != 0:
-                tots2= tots2 - tots*personaldiscount*0.01
+                finaltotal= finaltotal - initialtotal*personaldiscount*0.01
                 bill.insert(END,'Personal Discount%:\t\t\t'+str(personaldiscount)+'\n')
 
             with open('preferences.dat','r+b') as x:
                 import pickle
                 dictionary = pickle.load(x)
                 disc = int(dictionary['Discount'])
-                tots2 -= (disc/100)*tots2
+                finaltotal -= (disc/100)*finaltotal
             if disc != 0:
                 bill.insert(END,'Discount%:\t\t\t'+str(disc)+'\n')
             with open('preferences.dat','r+b') as x:
                 import pickle
                 dictionary = pickle.load(x)
                 tax = int(dictionary['Tax'])
-                tots2 += (tax/100)*tots2
+                finaltotal += (tax/100)*finaltotal
             if tax != 0:
                 bill.insert(END,'Tax%:\t\t\t'+str(tax)+'\n')
             if paystatues.get()=='Credit':
-                tots2 = -(tots2)                  
-            bill.insert(END,'Total Price:\t\t\t'+str(tots2)+'\n')
+                finaltotal = -(finaltotal)                  
+            bill.insert(END,'Total Price:\t\t\t'+str(finaltotal)+'\n')
             bill.insert(END,'-'*30+'\n')
             bill.insert(END,'Status:\t\t'+str(status123)+'\n')
             bill.insert(END,'Order Type:\t\t'+str(type123)+'\n')
@@ -366,13 +366,13 @@ def start():
 
 
 
-    #==================================Order Taking=======================
+    # ================================== Order Taking======================= 
 
-    takeframe = LabelFrame(app,bd=5,relief='flat',bg=background123)
+    takeframe = LabelFrame(app,bd=5,relief='flat',bg=background)
     takeframe.place(x=0,y=220,height=400,width=900)
 
     #Add order
-    addframe = LabelFrame(takeframe,bd=5,relief='ridge',bg=background123) 
+    addframe = LabelFrame(takeframe,bd=5,relief='ridge',bg=background) 
     addframe.place(x=0,y=5,width=600,height=80)
 
     addlabel = Label(addframe,text='Add Item:', font=('Arial',12,'bold'),padx=20,pady=25)
@@ -498,13 +498,13 @@ def start():
     ap.mainloop()
 
 def goneworder():
-    global ap, snumber,orderlist,tots,noofitems,personaldiscountnumber, o,personaldiscount
+    global ap, snumber,orderlist,initialtotal,noofitems,personaldiscountnumber, listofallitmes,personaldiscount
     ap.destroy()
     snumber = 1
     noofitems = 0
     orderlist = []
-    tots=0
-    o=[]
+    initialtotal=0
+    listofallitmes=[]
     start()
     personaldiscountnumber = 0
     personaldiscount = 0

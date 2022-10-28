@@ -6,9 +6,19 @@ def connectioncheck(x):
     if x.is_connected():
         print('Connected...')
 
-def new_user(x):
+def new_userquickfix():
     con = connect(host=host, user=user,password=password)
     connectioncheck(con)
+    cur = con.cursor()
+    cur.execute('create database if not exists Restaurant_Management')
+    cur.execute('use Restaurant_Management')
+    cur.execute('create table if not exists fooditems(Name varchar(20) NOT NULL primary key,Price int NOT NULL,Category varchar(20))')
+    con.close()
+
+new_userquickfix()
+
+def new_user(x):
+    con = connect(host=host, user=user,password=password)
     cur = con.cursor()
     cur.execute('create database if not exists Restaurant_Management')
     cur.execute('use Restaurant_Management')
@@ -64,15 +74,13 @@ def addtodata1(name,price,category):
     con.commit()
     con.close()
 
-def addtodatabase1(serialnumber,moobilenumber,noofitemsoredered,o,type123,status123,tots,path):
+def addtodatabase1(serialnumber,moobilenumber,noofitemsoredered,o,type123,status123,initialtotal,path):
     con = connect(host=host, user=user,password=password,database='restaurant_management')
     cur = con.cursor()
-    cur.execute(f"""Insert into {path} values({int(serialnumber)},'{moobilenumber}',{noofitemsoredered},"{o}",'{type123}','{status123}',{int(tots)})""")
+    cur.execute(f"""Insert into {path} values({int(serialnumber)},'{moobilenumber}',{noofitemsoredered},"{o}",'{type123}','{status123}',{int(initialtotal)})""")
     con.commit()
     con.close()
 
-
-#Some mistake
 
 fooditems = getfooditems()
 
@@ -90,6 +98,6 @@ restaurantname='Green City'
 
 foreground123 = 'DarkSlateGray'
 
-background123 = 'paleturquoise'
+background = 'paleturquoise'
 
 numbers = list(range(1,14))
