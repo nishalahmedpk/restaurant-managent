@@ -1,4 +1,4 @@
-from mysql.connector import*
+from mysql.connector import *
 
 host,user,password = 'localhost','root','1234567890'
 
