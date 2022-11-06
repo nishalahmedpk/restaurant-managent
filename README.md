@@ -5,8 +5,9 @@
 <li>Add Personal Discount
 <li>Add Delivery Fee
 <li>Generate Bill
+<li>Delete Order
 </ul>
 <h2>Cons:</h2>
 <ul>
-<li>Can't Delete Order
+<li>Cannot View Orders In GUI
 </ul>

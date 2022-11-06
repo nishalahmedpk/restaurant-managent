@@ -11,6 +11,12 @@ listofallitmes = []
 personaldiscountnumber = 0
 personaldiscount = 0
 
+
+def deleteorder():
+    global order,orderno1
+    orderno1 = int(orderentry.get())
+    deleteorder1(orderno1,table)
+
 def getpath():
     with open('preferences.dat','r+b') as x:
         import pickle
@@ -127,7 +133,7 @@ def start():
             int(mobileno.get())
         except ValueError:
             dog =1
-        if len(mobileno.get()) != 12 or dog==1 or ordertypecombo.get()=='' or paystatues.get()=='' or orderlist==[]:
+        if len(mobileno.get()) > 12 or dog==1 or ordertypecombo.get()=='' or paystatues.get()=='' or orderlist==[]:
             messagebox.showerror('Error','Enter All Fields Properly')
         else:
             addtodatabase()
@@ -237,7 +243,7 @@ def start():
         databasepath.grid(row=4,column=1)
         databasepath.insert(0,str(table))
 
-        apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg=foreground123,fg='white',command=preferences)
+        apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg=foreground123,fg=textcolour,command=preferences)
         apply.grid(row=5,column=0)
         clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg=foreground123,command=newdatabase(databasepath.get()))
         clear.grid(row=5,column=1)
@@ -273,10 +279,31 @@ def start():
         moneyentry.grid(row=1,column=1)
         moneyentry.insert(0,'0')
 
-        personaldiscountbutton = Button(frame1,text='Apply',font=('arial',30,'bold'),pady=-5,padx=150,fg='white',bg=foreground123,command=personaldiscountsupdate)
+        personaldiscountbutton = Button(frame1,text='Apply',font=('arial',30,'bold'),pady=-5,padx=150,fg=textcolour,bg=foreground123,command=personaldiscountsupdate)
         personaldiscountbutton.grid(row=2,column=1)
 
-        discounts.mainloop()
+        discounts.mainloop()   
+
+    def go_deleteorder():       
+        global orderentry,deleteorder
+        deleteorderlevel = Toplevel(ap)
+        deleteorderlevel.title('Delete Order')
+        deleteorderlevel.geometry(f'900x475+0+150')
+        deleteorderlevel.state('zoomed')
+
+        frame1 = Frame(deleteorderlevel,bd=5,height=375,width=800,relief='ridge', padx=20,pady=20)
+        frame1.place(anchor=CENTER,relx=0.5, rely=0.5)
+
+        order =  Label(frame1,text='Order No:',font=('arial',30,'bold'),pady=20,padx=5)
+        order.grid(row=0,column=0)
+        orderentry = Entry(frame1,font=('arial',30,'bold'))
+        orderentry.grid(row=0,column=1)
+
+        delorderbutton = Button(frame1,text='Delete',font=('arial',30,'bold'),pady=-5,padx=150,fg='red',bg=foreground123,command=deleteorder)
+        delorderbutton.grid(row=2,column=1)
+
+        deleteorderlevel.mainloop()
+
     def addinv():
 
         def addtodata():
@@ -285,6 +312,7 @@ def start():
             category = catentry.get()
             try:    
                 addtodata1(name,price,category)
+                messagebox.INFO('Restart Program To Apply Changes')
             except ValueError:
                 messagebox.ERROR('Enter Fields Properly')
 
@@ -317,7 +345,7 @@ def start():
         priceentry = Entry(frame1,font=('arial',20,'bold'))
         priceentry.grid(row=2,column=1)
         
-        add = Button(frame1,text='Add Item',font=('arial',20,'bold'),padx=80,bg=foreground123,fg='white', command=addtodata)
+        add = Button(frame1,text='Add Item',font=('arial',20,'bold'),padx=80,bg=foreground123,fg=textcolour, command=addtodata)
         add.grid(row=4,column=1)
 
         inv.mainloop()
@@ -330,12 +358,13 @@ def start():
 
 
     #Header
-    headingframe = Label(app,bd=20,text=restaurantname,fg='white',bg=foreground123,font=('arial',50,'bold'))
+    #Chiller ,Castellar Old ,English Text MT
+    headingframe = Label(app,bd=20,text=restaurantname,fg=textcolour,bg=foreground123,font=('Algerian',50))
     headingframe.pack(side='top',fill='x')
 
     #======================Order Details======================
 
-    orderframe = LabelFrame(app,bd=5,relief='flat')
+    orderframe = LabelFrame(app,bd=5,relief='ridge')
     orderframe.place(x=0,y=120,height=100,width=900)
 
     ordernotext = Label(orderframe,text='Order No:',font=('Arial',12,'bold'),padx=25,pady=15)  #Order NO
@@ -368,11 +397,11 @@ def start():
 
     # ================================== Order Taking======================= 
 
-    takeframe = LabelFrame(app,bd=5,relief='flat',bg=background)
+    takeframe = LabelFrame(app,bd=5,relief='ridge',bg=background)
     takeframe.place(x=0,y=220,height=400,width=900)
 
     #Add order
-    addframe = LabelFrame(takeframe,bd=5,relief='ridge',bg=background) 
+    addframe = LabelFrame(takeframe,bd=5,relief='flat',bg=background) 
     addframe.place(x=0,y=5,width=600,height=80)
 
     addlabel = Label(addframe,text='Add Item:', font=('Arial',12,'bold'),padx=20,pady=25)
@@ -392,11 +421,11 @@ def start():
     blank = Label(addframe,text='',padx=10)
     blank.grid(row=0,column=4)
 
-    addbutton = Button(addframe,text='Add', font=('Arial',12,'bold'),padx=20,fg='white',bg=foreground123,command=additem)
+    addbutton = Button(addframe,text='Add', font=('Arial',12,'bold'),padx=20,fg=textcolour,bg=foreground123,command=additem)
     addbutton.grid(row=0,column=5)
 
     #Items
-    itemsframe = LabelFrame(takeframe,bd=5,relief='ridge',padx=10,pady=10)
+    itemsframe = LabelFrame(takeframe,bd=5,relief='flat',padx=10,pady=10)
     itemsframe.place(x=0,y=90,width=600,height=295)
 
 
@@ -451,7 +480,7 @@ def start():
 
 
     #OrderStatus Generate Bill and Bill
-    billframe = LabelFrame(takeframe,bd=5,relief='ridge')
+    billframe = LabelFrame(takeframe,bd=5,relief='groove')
     billframe.place(x=610,y=5,height=380,width=275)
 
     statusframe = LabelFrame(billframe,padx=50,relief='flat')
@@ -465,7 +494,7 @@ def start():
     paystatues['values'] = paystatuesvalues
     paystatues.grid(row=0,column=1)
 
-    generatebill = Button(billframe,text='Generate Bill', font=('Arial',12,'bold'),padx=67,fg='white',bg=foreground123,command=placeorder)
+    generatebill = Button(billframe,text='Generate Bill', font=('Arial',12,'bold'),padx=67,fg=textcolour,bg=foreground123,command=placeorder)
     generatebill.grid(row=1)
 
     bill = Text(billframe, height=14,width=30,pady=10,state='disabled')
@@ -474,27 +503,24 @@ def start():
 
     #===============================Bottom Part================================
 
-    bottomframe = LabelFrame(app,bd=5,relief='flat')
+    bottomframe = LabelFrame(app,bd=5,relief='ridge')
     bottomframe.place(x=0,y=620,height=80,width=900)
 
-    newfood = Button(bottomframe,text='Add To Inventory',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg=foreground123,command=addinv)
+    newfood = Button(bottomframe,text='Add To Inventory',font=('Arial',12,'bold'),padx=25,pady=15,fg=textcolour,bg=foreground123,command=addinv)
     newfood.place(x=5,y=5)
 
-    settingsbutton = Button(bottomframe,text='Preferences',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg=foreground123,command=gosettings)
+    settingsbutton = Button(bottomframe,text='Preferences',font=('Arial',12,'bold'),padx=25,pady=15,fg=textcolour,bg=foreground123,command=gosettings)
     settingsbutton.place(x=205,y=5)
 
-    discounts = Button(bottomframe,text='Discounts',font=('Arial',12,'bold'),padx=25,pady=15,fg='red',bg=foreground123,command=godiscounts)
+    discounts = Button(bottomframe,text='Discounts',font=('Arial',12,'bold'),padx=25,pady=15,fg=textcolour,bg=foreground123,command=godiscounts)
     discounts.place(x=515,y=5)
 
-    neworder = Button(bottomframe,text='New Order',font=('Arial',12,'bold'),padx=25,pady=15,fg='white',bg=foreground123,command=goneworder)
+    neworder = Button(bottomframe,text='New Order',font=('Arial',12,'bold'),padx=25,pady=15,fg=textcolour,bg=foreground123,command=goneworder)
     neworder.place(x=365,y=5)
 
+    deleteorderbutton = Button(bottomframe,text='Delete Order',font=('Arial',12,'bold'),padx=58,pady=15,fg='red',bg=foreground123,command=go_deleteorder)
+    deleteorderbutton .place(x=660,y=5)
 
-    about2 = Label(bottomframe,text='Nishal',font=('Roberto',20,'bold'))
-    about2.place(y=30,x=790)
-
-    about = Label(bottomframe,text='Jonathan &',font=('Arial',12,'bold'))
-    about.place(y=5,x=785)
     ap.mainloop()
 
 def goneworder():

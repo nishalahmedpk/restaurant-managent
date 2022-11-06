@@ -42,13 +42,17 @@ def getordernop(x):
     con.close()
     return x+1
 
-def getfooditems():  #Not Working
+def getfooditems():
     con = connect(host=host, user=user,password=password,database='restaurant_management')
     cur = con.cursor()
     cur.execute("Select distinct Name from fooditems")
     x=list(cur.fetchall())
+    l=[]
+    for i in x:
+        for j in i:
+            l.append(j)
     con.close()
-    return x
+    return l
 
 #Returns Full List For additems():
 def getallfoooditems():
@@ -81,6 +85,12 @@ def addtodatabase1(serialnumber,moobilenumber,noofitemsoredered,o,type123,status
     con.commit()
     con.close()
 
+def deleteorder1(orderno,path):
+    con = connect(host=host, user=user,password=password,database='restaurant_management')
+    cur = con.cursor()
+    cur.execute(f"delete from {path} where sno={orderno}")
+    con.commit()
+    con.close()
 
 fooditems = getfooditems()
 
@@ -94,10 +104,12 @@ ordertypecombovalues = ['Dine-in','Take-Away','Delivery']
 
 paystatuesvalues = ('Paid','Not Paid','Credit')
 
-restaurantname='Green City'
+restaurantname='BIG RESTAURANT'
 
-foreground123 = 'DarkSlateGray'
+foreground123 = 'black'
 
-background = 'paleturquoise'
+background = 'black'
+
+textcolour = 'gold'
 
 numbers = list(range(1,14))
