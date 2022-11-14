@@ -33,7 +33,13 @@ table = getpath()
 new_user(table)
 
 def start():
-    global ap,xaxis
+    global ap
+
+    # FOOD ITEMS 
+    fooditems = getfooditems()
+    listofallfooditems = getallfoooditems()
+    foodcategory = getfoodcategory()
+
     ap = Tk()
     ap.tk_setPalette(background)
     ap.title('Restaurant Management 0.1 Beta')
@@ -43,6 +49,7 @@ def start():
     #==========Commmands=================
 
     def preferences():
+        print('Preferences Called')
         #discount
         discountdata = percententry1.get()
         #currency
@@ -245,7 +252,11 @@ def start():
 
         apply = Button(frame1,text='Apply Changes',font=('arial',20,'bold'),bg=foreground123,fg=textcolour,command=preferences)
         apply.grid(row=5,column=0)
-        clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg=foreground123,command=newdatabase(databasepath.get()))
+
+        def cleardb1():
+            newdatabase(databasepath.get())
+
+        clear = Button(frame1,text='Clear Database',font=('arial',20,'bold'),padx=35,fg='red',bg=foreground123,command=cleardb1)
         clear.grid(row=5,column=1)
 
 
@@ -312,7 +323,6 @@ def start():
             category = catentry.get()
             try:    
                 addtodata1(name,price,category)
-                messagebox.INFO('Restart Program To Apply Changes')
             except ValueError:
                 messagebox.ERROR('Enter Fields Properly')
 
@@ -359,7 +369,7 @@ def start():
 
     #Header
     #Chiller ,Castellar Old ,English Text MT
-    headingframe = Label(app,bd=20,text=restaurantname,fg=textcolour,bg=foreground123,font=('Algerian',50))
+    headingframe = Label(app,bd=20,text=restaurantname,fg=textcolour,bg=background,font=(restaurantnamefont,50,style123))
     headingframe.pack(side='top',fill='x')
 
     #======================Order Details======================
@@ -524,7 +534,7 @@ def start():
     ap.mainloop()
 
 def goneworder():
-    global ap, snumber,orderlist,initialtotal,noofitems,personaldiscountnumber, listofallitmes,personaldiscount
+    global ap, snumber,orderlist,initialtotal,noofitems,personaldiscountnumber,listofallitmes,personaldiscount,fooditems,listofallfooditems,foodcategory
     ap.destroy()
     snumber = 1
     noofitems = 0
@@ -534,5 +544,6 @@ def goneworder():
     start()
     personaldiscountnumber = 0
     personaldiscount = 0
+
 
 start()
