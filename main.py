@@ -1,8 +1,6 @@
 from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 from mysqldatabase import *
-
 
 snumber = 1
 noofitems = 0
@@ -33,12 +31,14 @@ table = getpath()
 new_user(table)
 
 def start():
-    global ap
+    global ap,table
 
     # FOOD ITEMS 
     fooditems = getfooditems()
     listofallfooditems = getallfoooditems()
     foodcategory = getfoodcategory()
+    table = getpath()
+    new_user(table)
 
     ap = Tk()
     ap.tk_setPalette(background)
